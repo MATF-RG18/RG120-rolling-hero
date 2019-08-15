@@ -12,7 +12,7 @@
 /* Vreme proteklo od pocetka simulacije. */
 static int time;
 /*Debljina putanje*/
-static int thickness = 0;
+static int thickness = 100;
 static int animation_ongoing_A=0, animation_ongoing_D=0, animation_ongoing_W=0,animation_ongoing_R=0,animation_ongoing_P = 0;
 /*Pomeraji*/
 static int xPlus=0, zPlus=0, zMinus=0;
@@ -41,8 +41,9 @@ int main(int argc, char **argv)
     glutDisplayFunc(on_display);
     //glutTimerFunc(TIMER_INTERVAL, on_timer, 0);
 
-    /* Obavlja se OpenGL inicijalizacija. */
-    glClearColor(0, 0, 0, 0);
+    /* Obavlja se OpenGL inicijalizacija. */  
+   //glClearColor(  0.184314, 0.184314, 0.309804,0);
+    glClearColor(  0.134314, 0.124314, 0.209804,0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -242,14 +243,14 @@ static void on_display(void)
     /*Osvetljenje i materijali putanje*/
     
     glShadeModel(GL_SMOOTH);    
-    GLfloat light_p[] = { -10, 50, 0, 0 };
+    GLfloat light_p[] = { 100, 1000, 1000, 0 };
     GLfloat light_a[] = { 0.2, 0.2, 0.2, 1 };    
     GLfloat light_d[] = { 0.7, 0.9, 0.9, 1 };    
     GLfloat light_s[] = { 0.9, 0.9, 0.9, 1 };    
-    GLfloat a_coeffs[] = { 1.0, 0.1, 0.1, 1 };    
-    GLfloat d_coeffs[] = { 0.3, 0.3, 0.8, 1 };   
+    GLfloat a_coeffs[] = { 0.858824,  0.439216 , 0.576471, 1 };    
+    GLfloat d_coeffs[] = { 0.858824 , 0.439216 , 0.576471, 1 };   
     GLfloat s_coeffs[] = { 0.4, 1, 1, 1 }; 
-    GLfloat sh = 1;
+    GLfloat sh = 0.5;
 
     
     glEnable(GL_LIGHTING);
@@ -269,49 +270,49 @@ static void on_display(void)
     //1
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(35,-1,0);
+      glTranslatef(35,-51,0);
       glScalef(100,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
     //2
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(110,-1,0);
+      glTranslatef(110,-51,0);
       glScalef(50,thickness,6);
       glutSolidCube(1);
     glPopMatrix();
     //3
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(135+40,-1,0);
+      glTranslatef(135+40,-51,0);
       glScalef(80,thickness,10);
       glutSolidCube(1);
     glPopMatrix();
     //4
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(215+100,-1,0);
+      glTranslatef(215+100,-51,0);
       glScalef(200,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
     //5
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(415+100,-1,0);
+      glTranslatef(415+100,-51,0);
       glScalef(200,thickness,25);
       glutSolidCube(1);
     glPopMatrix();
     //6
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(615+50,-1,0);
+      glTranslatef(615+50,-51,0);
       glScalef(100,thickness,5);
       glutSolidCube(1);
     glPopMatrix();
     //7
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(665 + 100,-1,0);
+      glTranslatef(665 + 100,-51,0);
       glScalef(200,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
@@ -384,7 +385,7 @@ static void on_display(void)
     //22
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(161,1,-3.4);
+      glTranslatef(161,1,-3);
       glScalef(7,2,3);
       glutSolidCube(1);
     glPopMatrix();   
