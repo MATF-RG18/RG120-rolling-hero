@@ -6,6 +6,7 @@
 #include<math.h>
 #include "image.h"
 #include "boundaries.h"
+#include "sumpoints.h"
 #include<stdbool.h>
 
 #define TIMER_INTERVAL 300
@@ -26,7 +27,9 @@
 static GLuint names[6];
 
 /* Vreme proteklo od pocetka simulacije. */
-static int time;
+static int time=0;
+/*Broj poena osvojen u toku igre*/
+static int points = 0;
 /*Debljina putanje*/
 static int thickness = 100;
 static int animation_ongoing_A=0, animation_ongoing_D=0, animation_ongoing_W=0,animation_ongoing_R=0,animation_ongoing_P = 0;
@@ -221,10 +224,14 @@ static void on_keyboard(unsigned char key, int x, int y)
         
         /*Vracanje loptice na pocetnu poziciju (reset)*/
         case 'r':{
-         animation_ongoing_W=0;
-         animation_ongoing_D=0;
-         animation_ongoing_A=0;
-         glutTimerFunc(TIMER_INTERVAL,on_timer,4);
+        animation_ongoing_W=0;
+        animation_ongoing_D=0;
+        animation_ongoing_A=0;
+        xPlus=0, zPlus=0, zMinus=0;
+        time = 0;
+        points = 0;
+        glutPostRedisplay();
+        glutTimerFunc(TIMER_INTERVAL,on_timer,4);
             break;
         }
         /*(pause)*/
@@ -266,7 +273,6 @@ static void on_timer(int value)
         glutTimerFunc(100,on_timer,3);
    }
     else if(value == TID_4 && animation_ongoing_R == 1){
-        // za resetovanje (ne valja ovo!) animationParameter = -1;
         glutPostRedisplay();
         glutTimerFunc(1000,on_timer,4);
    }
@@ -291,9 +297,9 @@ static void on_timer(int value)
     glutInitWindowSize(250, 20);
     glutInitWindowPosition(560, 560);
     glutCreateWindow("Game over! :(");
-    //exit(0);
    }
 
+   points += SumPoints(x_curr,z_curr);
 
    if(x_curr>=2000){
     animation_ongoing_W=0;
@@ -301,8 +307,11 @@ static void on_timer(int value)
     animation_ongoing_A=0;
 
     /* Kreira se novi prozor u slucaju pobede */
+    
+
     glutInitWindowSize(250, 20);
     glutInitWindowPosition(560, 560);
+    printf("%d\n", points);
     glutCreateWindow("You Won!!! :)");
    }
     
@@ -710,13 +719,14 @@ static void on_display(void)
     /*Osvetljenje i materijali prepreka*/
     
     glShadeModel(GL_SMOOTH);    
-    GLfloat light_p1[] = { -10, 50, 20, 0 };
+    GLfloat light_p1[] = { -10, 100, 1000, 0 };
     GLfloat light_a1[] = { 0.7, 0.2, 0.2, 1 };    
     GLfloat light_d1[] = { 0.3, 0.4, 0.9, 1 };    
     GLfloat light_s1[] = { 0.9, 0.9, 0.9, 1 };    
-    GLfloat a_coeffs1[] = { 1.0, 0.5, 0.1, 1 };    
+    GLfloat a_coeffs1[] = { 0.7, 0.5, 0.1, 1 };    
     GLfloat d_coeffs1[] = { 0.3, 0.3, 0.8, 1 };   
-    GLfloat s_coeffs1[] = { 0.4, 1, 1, 1 }; 
+                            //0.4,1,1,1
+    GLfloat s_coeffs1[] = { 0.447059 , 0.264706,0.284706, 1}; 
     GLfloat sh1 = 1;
 
     
@@ -971,7 +981,874 @@ static void on_display(void)
       glutSolidCube(1);
     glPopMatrix(); 
 
+    //810
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1186,1,2);
+      glScalef(6,2,6);
+      glutSolidCube(1);
+    glPopMatrix();
+    //91
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1213,1,2);
+      glScalef(7,20,7);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //92
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1229,1,3.7);
+      glScalef(15,3,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //93
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1270,1,-3.7);
+      glScalef(15,3,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //94
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1342,1,-7);
+      glScalef(10,7,7);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //95
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1371,1,7);
+      glScalef(18,6,5);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //96
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1400,1,-2);
+      glScalef(2,2,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //97
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1433,1,-5);
+      glScalef(5,8,3);
+      glutSolidCube(1);
+    glPopMatrix();
+    //98
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1464,1,-5);
+      glScalef(5,13,5);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //99
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1497,1,3);
+      glScalef(20,7,1);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //910
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1515,1,3);
+      glScalef(20,7,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //911
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1547,1,3);
+      glScalef(20,7,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //912
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1582,1,-3);
+      glScalef(20,7,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+     //913
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1383,1,-3);
+      glScalef(6,6,6);
+      glutSolidCube(1);
+    glPopMatrix(); 
 
+    //10
+  
+    //2
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1617,1,-1.6);
+      glScalef(4.3,4.3,4.3);
+      glutSolidCube(1);
+    glPopMatrix();   
+    //3
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1635,1,-3.2);
+      glScalef(3,1.8,2.6);
+      glutSolidCube(1);
+    glPopMatrix();
+    //4
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1670,1,3);
+      glScalef(5,3,3);
+      glutSolidCube(1);
+    glPopMatrix();
+    //5
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1698,1,3.5);
+      glScalef(1.4,1,2);
+      glutSolidCube(1);
+    glPopMatrix();
+    //6
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1703,1,-3);
+      glScalef(7,2,3);
+      glutSolidCube(1);
+    glPopMatrix();   
+    //7
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1730,1,2.5);
+      glScalef(10,3,5);
+      glutSolidCube(1);
+    glPopMatrix();  
+     //8
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1760,1,0);
+      glScalef(2,2,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //9
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1793,1,-3);
+      glScalef(6,8,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //10
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1812,1,4);
+      glScalef(12,17,3.4);
+      glutSolidCube(1);
+    glPopMatrix();
+    //11
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1831,1,-5);
+      glScalef(8,4,1);
+      glutSolidCube(1);
+    glPopMatrix();
+
+    //12
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1862,1,-4);
+      glScalef(8,8,8);
+      glutSolidCube(1);
+    glPopMatrix(); 
+
+    //13
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1880,1,8);
+      glScalef(7,2,3);
+      glutSolidCube(1);
+    glPopMatrix();
+
+    //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
+
+    /*DIJAMANTI*/
+
+    glShadeModel(GL_SMOOTH);       
+    GLfloat a_coeffs2[] = {  0.196078 , 0.196078 , 0.8, 1 };    
+    GLfloat d_coeffs2[] = { 0.196078 ,0.196078 , 0.8, 1 };   
+    GLfloat s_coeffs2[] = { 0.74902 , 0.847059 , 0.847059, 1}; 
+    GLfloat sh2 = 1;
+ 
+    glMaterialfv(GL_FRONT, GL_AMBIENT, a_coeffs2);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, d_coeffs2);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, s_coeffs2);
+    glMaterialf(GL_FRONT, GL_SHININESS, sh2);  
+  
+    //1
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(6,1,3);
+      glScalef(0.6,0.6,0.6);
+      // Dijamanti se rotiraju 
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(10,1,3);
+      glScalef(0.6,0.6,0.6); 
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(14,1,3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //2
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(95,1,2.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(100,1,2.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(120,1,-2.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(125,1,-2.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //3
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(150,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+        glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(155,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(198,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //4
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(253,1,-5.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(258,1,-5.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(261,1,-5.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(350,1,2);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(360,1,2);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //5
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(415,1,-10);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(420,1,-10);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(470,1,5.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(477,1,5.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(560,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(570,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //6
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(630,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(634,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //7
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(678,1,-6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(683,1,-6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(688,1,6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(725,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(740,1,-2.3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(800,1,6.8);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(805,1,6.8);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //8
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(869,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(874,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(900,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(900,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(950,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(955,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(960,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(980,1,5.4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(990,1,5.4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1130,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1134,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //9
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1200,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1205,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+        glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1250,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1255,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1260,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1330,1,-7.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1335,1,-7.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1390,1,4.3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1428,1,4.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1433,1,4.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1480,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1485,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1490,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1520,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1525,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1530,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1570,1,4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1575,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1580,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1585,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    //10
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1600,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1605,1,-4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1650,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1655,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1660,1,0);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1730,1,-7.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1735,1,-7.5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1790,1,4.3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1828,1,4.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1433,1,4.6);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1880,1,5.-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1885,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1890,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1920,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1925,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1930,1,-3);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1970,1,4);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1975,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1980,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
+
+     glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1985,1,5);
+      glScalef(0.6,0.6,0.6);
+      glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
+      glutSolidOctahedron();
+    glPopMatrix();
 
     //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
@@ -979,6 +1856,7 @@ static void on_display(void)
 
     /*Zgradice*/
 
+    //desna
     glBindTexture(GL_TEXTURE_2D, names[1]);     
       glBegin(GL_POLYGON);
         glNormal3f(0,0,1); 
@@ -996,7 +1874,7 @@ static void on_display(void)
         glVertex3f(0, -100, 35);
      glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
-    //desna
+    
   
     //leva
       glBindTexture(GL_TEXTURE_2D, names[1]);     
@@ -1035,6 +1913,7 @@ static void on_display(void)
         glVertex3f(1000, -100, -1000);
      glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
+
   /*pesak*/
     glBindTexture(GL_TEXTURE_2D, names[3]);     
       glBegin(GL_POLYGON);
