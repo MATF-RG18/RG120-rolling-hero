@@ -1,6 +1,12 @@
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<GL/gl.h>
+#include<GL/glu.h>
 #include <GL/glut.h>
 #include<math.h>
+#include "image.h"
+#include "boundaries.h"
+#include<stdbool.h>
 
 #define TIMER_INTERVAL 300
 #define TID_1 1
@@ -9,6 +15,16 @@
 #define TID_4 4
 #define TID_5 5
 
+/* Imena fajlova sa teksturama. */
+#define FILENAME0 "wood.bmp"
+#define FILENAME1 "lights.bmp"
+#define FILENAME2 "grass.bmp"
+#define FILENAME3 "sand.bmp"
+#define FILENAME4 "sea.bmp"
+#define FILENAME5 "sky1.bmp"
+/* Identifikatori tekstura. */
+static GLuint names[6];
+
 /* Vreme proteklo od pocetka simulacije. */
 static int time;
 /*Debljina putanje*/
@@ -16,12 +32,18 @@ static int thickness = 100;
 static int animation_ongoing_A=0, animation_ongoing_D=0, animation_ongoing_W=0,animation_ongoing_R=0,animation_ongoing_P = 0;
 /*Pomeraji*/
 static int xPlus=0, zPlus=0, zMinus=0;
+/* Parametar animacije */
+//static float animationParameter = -1.0;
+/*Trenutne koord. centra loptice*/
+static float x_curr = -10, z_curr = 0; 
 
 /* Deklaracije callback funkcija. */
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_display(void);
 static void on_timer(int value);
+static void initialize(void);
+//static void CheckBoundries(float x_curr,float z_curr);
 
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
@@ -49,12 +71,121 @@ int main(int argc, char **argv)
     glCullFace(GL_BACK);
 
     //face = GL_FRONT;
-
+    initialize();
     /* Program ulazi u glavnu petlju. */
     glutMainLoop();
 
     return 0;
 }
+static void initialize(void)
+{
+    /* Objekat koji predstavlja teskturu ucitanu iz fajla.
+    Sve vezano za teksture uzeto je iz kodova sa casa */
+
+    Image * image;
+
+
+    glEnable(GL_DEPTH_TEST);
+
+    /* Ukljucuju se teksture. */
+    glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+
+    image = image_init(0, 0);
+
+    image_read(image, FILENAME0);
+
+    /* Generisu se identifikatori tekstura. */
+    glGenTextures(6, names);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+    /* Kreira se prva tekstura. */
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S,GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T,GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+    /* Tekstura Zgrada */
+    image_read(image, FILENAME1);
+    glBindTexture(GL_TEXTURE_2D, names[1]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    /* Trava. */
+    image_read(image, FILENAME2);
+    glBindTexture(GL_TEXTURE_2D, names[2]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    /*Kreira se tekstura peska*/
+    image_read(image, FILENAME3);   
+    glBindTexture(GL_TEXTURE_2D, names[3]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    /*Kreira se tekstura mora*/
+    image_read(image, FILENAME4);
+    glBindTexture(GL_TEXTURE_2D, names[4]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    /*Nebo*/
+    image_read(image, FILENAME5);
+    glBindTexture(GL_TEXTURE_2D, names[5]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S,  GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+
+    /* Iskljucujemo aktivnu teksturu */
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /* Unistava se objekat za citanje tekstura iz fajla. */
+    image_done(image);
+
+}
+
 //----------------------------------------------------------------------------------------------
 static void on_keyboard(unsigned char key, int x, int y)
 {
@@ -114,6 +245,7 @@ static void on_timer(int value)
 {
 
     time += 200;
+    //animationParameter += 0.01;
 
    if(value == TID_1 && animation_ongoing_W == 1){
         xPlus += 1;
@@ -134,7 +266,7 @@ static void on_timer(int value)
         glutTimerFunc(100,on_timer,3);
    }
     else if(value == TID_4 && animation_ongoing_R == 1){
-        //ovde mi fali da vratim na pocetnu poz.
+        // za resetovanje (ne valja ovo!) animationParameter = -1;
         glutPostRedisplay();
         glutTimerFunc(1000,on_timer,4);
    }
@@ -144,9 +276,37 @@ static void on_timer(int value)
         glutTimerFunc(1000,on_timer,5);
    }
 
-
    else
     return;
+  
+   
+   x_curr = xPlus - 10;
+   z_curr = zPlus-zMinus;
+
+   if(CheckBoundries(x_curr,z_curr) == true){
+    /* Kreira se novi prozor u slucaju izgubljene igre */
+    animation_ongoing_W=0;
+    animation_ongoing_D=0;
+    animation_ongoing_A=0;
+    glutInitWindowSize(250, 20);
+    glutInitWindowPosition(560, 560);
+    glutCreateWindow("Game over! :(");
+    //exit(0);
+   }
+
+
+   if(x_curr>=2000){
+    animation_ongoing_W=0;
+    animation_ongoing_D=0;
+    animation_ongoing_A=0;
+
+    /* Kreira se novi prozor u slucaju pobede */
+    glutInitWindowSize(250, 20);
+    glutInitWindowPosition(560, 560);
+    glutCreateWindow("You Won!!! :)");
+   }
+    
+  
 }
 //--------------------------------------------------------------------------------
 static void on_reshape(int width, int height)
@@ -189,9 +349,11 @@ static void on_display(void)
     /* Koeficijenti ambijentalne refleksije materijala. */
     GLfloat ambient_coeffs[] = { 1.0, 0.1, 0.1, 1 };
     /* Koeficijenti difuzne refleksije materijala. */
-    GLfloat diffuse_coeffs[] = { 0.3, 0.3, 0.8, 1 };
+   // GLfloat diffuse_coeffs[] = { 0.3, 0.3, 0.8, 1 };
+    GLfloat diffuse_coeffs[] = { 0.647059 , 0.164706,0.164706,1};
     /* Koeficijenti spekularne refleksije materijala. */
-    GLfloat specular_coeffs[] = { 1, 1, 1, 1 };
+    //GLfloat specular_coeffs[] = { 1, 1, 1, 1 };
+    GLfloat specular_coeffs[] = { 0.647059 , 0.164706,0.164706, 1 };
     /* Koeficijent glatkosti materijala. */
     GLfloat shininess = 10;
 
@@ -228,6 +390,7 @@ static void on_display(void)
     glEnd();
 
     /* Pravimo lopticu */
+    //glBindTexture(GL_TEXTURE_2D, names[0]);  
     glPushMatrix();
      glColor3f(1, 0, 0);
      glTranslatef(-10,0,0);
@@ -236,6 +399,7 @@ static void on_display(void)
      glRotatef(-360 * time / (1.2*12*30 * 24), 0, 0, 1);
      glutSolidSphere(1, 16, 16);
     glPopMatrix();
+   // glBindTexture(GL_TEXTURE_2D, 0);  
 
     /* Pravljenje putanje*/
     //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
@@ -247,8 +411,10 @@ static void on_display(void)
     GLfloat light_a[] = { 0.2, 0.2, 0.2, 1 };    
     GLfloat light_d[] = { 0.7, 0.9, 0.9, 1 };    
     GLfloat light_s[] = { 0.9, 0.9, 0.9, 1 };    
-    GLfloat a_coeffs[] = { 0.858824,  0.439216 , 0.576471, 1 };    
-    GLfloat d_coeffs[] = { 0.858824 , 0.439216 , 0.576471, 1 };   
+    //GLfloat a_coeffs[] = { 0.858824,  0.439216 , 0.576471, 1 };    
+    //GLfloat d_coeffs[] = { 0.858824 , 0.439216 , 0.576471, 1 }; 
+    GLfloat a_coeffs[] = { 0.647059 , 0.164706,0.164706,1 };    
+    GLfloat d_coeffs[] = { 0.647059 , 0.164706,0.164706,1 };   
     GLfloat s_coeffs[] = { 0.4, 1, 1, 1 }; 
     GLfloat sh = 0.5;
 
@@ -264,57 +430,279 @@ static void on_display(void)
     glMaterialfv(GL_FRONT, GL_AMBIENT, a_coeffs);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, d_coeffs);
     glMaterialfv(GL_FRONT, GL_SPECULAR, s_coeffs);
-    glMaterialf(GL_FRONT, GL_SHININESS, sh);  
+    glMaterialf(GL_FRONT, GL_SHININESS, sh);
     
     /*Kao putanju loptice koristicemo skaliranu kocku*/
     //1
+    /*Postavljamo strukturu na putanju (stenu)*/
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(-15,-1, -7.5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(-15,-1, 7.5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(85, -1, 7.5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(85, -1, -7.5);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(35,-51,0);
+      glTranslatef(35,-51.001,0);
       glScalef(100,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
+
+   
+    
     //2
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(85,-1,-3);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(85,-1, 3);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(135, -1,3);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(135, -1, -3);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0); 
+
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(110,-51,0);
+      glTranslatef(110,-51.001,0);
       glScalef(50,thickness,6);
       glutSolidCube(1);
     glPopMatrix();
     //3
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(135,-1,-5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(135,-1,5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(215, -1,5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(215, -1,-5);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0); 
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(135+40,-51,0);
+      glTranslatef(135+40,-51.001,0);
       glScalef(80,thickness,10);
       glutSolidCube(1);
     glPopMatrix();
     //4
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(215,-1,-7.5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(215,-1,7.5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(415,-1,7.5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(415,-1,-7.5);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0); 
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(215+100,-51,0);
+      glTranslatef(215+100,-51.001,0);
       glScalef(200,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
     //5
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(415,-1,-12.5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(415,-1,12.5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(615,-1,12.5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(615,-1,-12.5);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0); 
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(415+100,-51,0);
+      glTranslatef(415+100,-51.001,0);
       glScalef(200,thickness,25);
       glutSolidCube(1);
     glPopMatrix();
     //6
+      glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(615,-1,-2.5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(615,-1,2.5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(665,-1,2.5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(665,-1,-2.5);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0);
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(615+50,-51,0);
+      glTranslatef(615+50,-51.001,0);
       glScalef(100,thickness,5);
       glutSolidCube(1);
     glPopMatrix();
     //7
+      glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(665,-1,-7.5);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(665,-1,7.5);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(865,-1,7.5);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(865,-1,-7.5);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0);
+
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(665 + 100,-51,0);
+      glTranslatef(665 + 100,-51.001,0);
       glScalef(200,thickness,15);
       glutSolidCube(1);
+    glPopMatrix();
+
+    //8
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(865,-1,-6);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(865,-1,6);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(1200,-1,6);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(1200,-1,-6);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0);
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(865 + 167.5,-51.001,0);
+      glScalef(335,thickness,12);
+      glutSolidCube(1);
+    glPopMatrix();
+
+  //9
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(1200,-1,-8);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(1200,-1,8);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(1600,-1,8);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(1600,-1,-8);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0);
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1200 + 200,-51.001,0);
+      glScalef(400,thickness,16);
+      glutSolidCube(1);
+    glPopMatrix();
+
+  //10
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(1600,-1,-10);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(1600,-1,10);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(2000,-1,10);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(2000,-1,-10);
+      glEnd();
+    glBindTexture(GL_TEXTURE_2D,0);
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1600 + 200,-51.001,0);
+      glScalef(400,thickness,20);
+      glutSolidCube(1);
+    glPopMatrix();
+
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(2000+7.2,-0.99,0);
+      glRotatef(90,1,0,0);
+      glutSolidCone(15,100,16,16);
     glPopMatrix();
 
     /*Prepreke na putu*/
@@ -364,7 +752,7 @@ static void on_display(void)
     glPushMatrix();
       glTranslatef(41,0.9,-3.2);
       glScalef(3,1.8,2.6);
-      glutSolidDodecahedron();
+      glutSolidCube(1);
     glPopMatrix();
     //04
     glColor3f(0,1,0);
@@ -374,50 +762,335 @@ static void on_display(void)
       glutSolidCube(1);
     glPopMatrix();
 
-
-    //21
+    //31
     glColor3f(0,1,0);
     glPushMatrix();
       glTranslatef(140,2,3.5);
       glScalef(1.4,1,2);
-      glutSolidDodecahedron();
+      glutSolidCube(1);
     glPopMatrix();
-    //22
+    //32
     glColor3f(0,1,0);
     glPushMatrix();
       glTranslatef(161,1,-3);
       glScalef(7,2,3);
       glutSolidCube(1);
     glPopMatrix();   
-    //23
+    //33
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(195,3.5,-3);
-      glRotatef(90,1,0,0);
-      glutSolidCone(3,5,16, 16);
-    glPopMatrix();
-    //24
+      glTranslatef(191,-0.5,2.5);
+      glScalef(10,3,5);
+      glutSolidCube(1);
+    glPopMatrix();  
+
+     //34
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(195,3.5,3);
-      glRotatef(90,1,0,0);
-      glutSolidCone(3,5,16, 16);
+      glTranslatef(210,1,0);
+      glScalef(2,2,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+
+    //41
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(250,1,-3);
+      glScalef(6,8,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+
+    //42
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(300,1,4);
+      glScalef(12,17,3.4);
+      glutSolidCube(1);
     glPopMatrix();
-    
 
+    //43
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(370,1,-5);
+      glScalef(8,4,1);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //51
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(418,1,-4);
+      glScalef(8,8,8);
+      glutSolidCube(1);
+    glPopMatrix(); 
 
-    
+    //52
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(440,1,8);
+      glScalef(7,2,3);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //53
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(495,1,5);
+      glScalef(13,4,4);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //54
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(536,1,-2);
+      glScalef(7,7,7);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //55
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(570,1,-2);
+      glScalef(8,4,1);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //56
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(515,1,6);
+      glScalef(8,8,3);
+      glutSolidCube(1);
+    glPopMatrix();
 
+    //71
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(670,1,-5.5);
+      glScalef(10,2,4);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //72
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(700,1,-3.7);
+      glScalef(15,15,4);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //73
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(742,1,3.7);
+      glScalef(15,15,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //74
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(780,1,-4);
+      glScalef(5,5,5);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //75
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(808,1,7);
+      glScalef(5,4,1);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //76
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(833,1,-2);
+      glScalef(2,2,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
 
+    //81
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(866,1,-4);
+      glScalef(20,20,10);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //82
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(920,1,3.7);
+      glScalef(15,3,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //83
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(935,1,-3.7);
+      glScalef(15,3,3);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //84
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(950,1,-7);
+      glScalef(10,7,7);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //85
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(999,1,7);
+      glScalef(18,6,5);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //86
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1060,1,-2);
+      glScalef(2,2,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //87
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1080,1,-5);
+      glScalef(5,8,3);
+      glutSolidCube(1);
+    glPopMatrix();
+  //88
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1100,1,-5);
+      glScalef(5,13,5);
+      glutSolidCube(1);
+    glPopMatrix(); 
+    //89
+    glColor3f(0,1,0);
+    glPushMatrix();
+      glTranslatef(1148,1,3);
+      glScalef(20,7,2);
+      glutSolidCube(1);
+    glPopMatrix(); 
 
 
 
     //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
+
+    /*Okolina*/
+
+    /*Zgradice*/
+
+    glBindTexture(GL_TEXTURE_2D, names[1]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,0,1); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(0,100, 35);
+
+        glTexCoord2f(1, 0);
+        glVertex3f(1000,100, 35);
+
+        glTexCoord2f(1, 1);
+        glVertex3f(1000, -100, 35);      
+
+        glTexCoord2f(0, 1);                  
+        glVertex3f(0, -100, 35);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+    //desna
+  
+    //leva
+      glBindTexture(GL_TEXTURE_2D, names[1]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,0,-1); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(0,-100, -35);
+
+        glTexCoord2f(1, 0);
+        glVertex3f(1000,-100, -35);
+
+        glTexCoord2f(1, 1);
+        glVertex3f(1000, 100, -35);      
+
+        glTexCoord2f(0, 1);                  
+        glVertex3f(0, 100, -35);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /*trava*/
+    glBindTexture(GL_TEXTURE_2D, names[2]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(-1000,-100, 1000);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(-1000,-100, 1000);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(1000, -100,1000);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(1000, -100, -1000);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+  /*pesak*/
+    glBindTexture(GL_TEXTURE_2D, names[3]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(1000,-100,-1000);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(1000,-100, 1000);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(1500, -100,1500);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(1500, -100,-1500);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+  /*more*/
+    glBindTexture(GL_TEXTURE_2D, names[4]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(0,1,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(1500,-100,-1500);
+
+        glTexCoord2f(10, 0);
+        glVertex3f(1500,-100,1500);
+
+        glTexCoord2f(10, 10);
+        glVertex3f(3000, -100,3000);      
+
+        glTexCoord2f(0, 10);                  
+        glVertex3f(3000, -100,-3000);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /*nebo*/
+    glBindTexture(GL_TEXTURE_2D, names[5]);     
+      glBegin(GL_POLYGON);
+        glNormal3f(-1,0,0); 
+
+        glTexCoord2f(0,0);
+        glVertex3f(2500,-100, -3000);
+
+        glTexCoord2f(1, 0);
+        glVertex3f(2500,-100, 3000);
+
+        glTexCoord2f(1, 1);
+        glVertex3f(2500, 1000, 3000);      
+
+        glTexCoord2f(0, 1);                  
+        glVertex3f(2500, 1000, -3000);
+     glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     /* Nova slika se salje na ekran. */
