@@ -7,7 +7,9 @@
 #include "image.h"
 #include "boundaries.h"
 #include "sumpoints.h"
+#include "draw.h"
 #include<stdbool.h>
+
 
 #define TIMER_INTERVAL 300
 #define TID_1 1
@@ -37,7 +39,7 @@ static int animation_ongoing_A=0, animation_ongoing_D=0, animation_ongoing_W=0,a
 static int xPlus=0, zPlus=0, zMinus=0;
 /* Parametar animacije */
 //static float animationParameter = -1.0;
-/*Trenutne koord. centra loptice*/
+/*Trenutne koord. centra figurice*/
 static float x_curr = -10, z_curr = 0; 
 
 /* Deklaracije callback funkcija. */
@@ -46,8 +48,11 @@ static void on_reshape(int width, int height);
 static void on_display(void);
 static void on_timer(int value);
 static void initialize(void);
-//static void CheckBoundries(float x_curr,float z_curr);
-
+/*
+Id figure
+Pocetna figura je loptica
+*/
+static int id =0;
 //--------------------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
@@ -131,7 +136,7 @@ static void initialize(void)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
                  image->width, image->height, 0,
                  GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
-    /* Trava. */
+    /* Trava */
     image_read(image, FILENAME2);
     glBindTexture(GL_TEXTURE_2D, names[2]);
     glTexParameteri(GL_TEXTURE_2D,
@@ -242,6 +247,12 @@ static void on_keyboard(unsigned char key, int x, int y)
          glutTimerFunc(TIMER_INTERVAL,on_timer,5);
             break;
         }
+
+        /*Menjamo oblik figure*/
+        case 'u': id=1; glutPostRedisplay(); break;
+        case 'i': id = 2; glutPostRedisplay(); break;
+        case 'o': id = 0; glutPostRedisplay(); break;
+        
         
     }
 }
@@ -252,7 +263,6 @@ static void on_timer(int value)
 {
 
     time += 200;
-    //animationParameter += 0.01;
 
    if(value == TID_1 && animation_ongoing_W == 1){
         xPlus += 1;
@@ -284,8 +294,7 @@ static void on_timer(int value)
 
    else
     return;
-  
-   
+  /*Trenutne koordinate loptice*/
    x_curr = xPlus - 10;
    z_curr = zPlus-zMinus;
 
@@ -302,16 +311,14 @@ static void on_timer(int value)
    points += SumPoints(x_curr,z_curr);
 
    if(x_curr>=2000){
+
     animation_ongoing_W=0;
     animation_ongoing_D=0;
     animation_ongoing_A=0;
-
+    printf("Broj osvojenih poena: %d\n", points);
     /* Kreira se novi prozor u slucaju pobede */
-    
-
     glutInitWindowSize(250, 20);
     glutInitWindowPosition(560, 560);
-    printf("%d\n", points);
     glutCreateWindow("You Won!!! :)");
    }
     
@@ -383,7 +390,7 @@ static void on_display(void)
     
 
     /* iscrtavanje koordinatnog sistema */
-    glBegin(GL_LINES);
+    /*glBegin(GL_LINES);
         // x osa (plava)
         glColor3f(0, 0, 1);
         glVertex3f(-1000, 0, 0);
@@ -396,20 +403,42 @@ static void on_display(void)
         glColor3f(1, 0, 0);
         glVertex3f(0, 0, -1000);
         glVertex3f(0, 0, 1000);
-    glEnd();
+    glEnd();*/
 
-    /* Pravimo lopticu */
-    //glBindTexture(GL_TEXTURE_2D, names[0]);  
+    /* Pravimo figuru */
+     
     glPushMatrix();
      glColor3f(1, 0, 0);
      glTranslatef(-10,0,0);
      glTranslatef(0+xPlus,0,0+zPlus-zMinus);
-     // rotacija loptice
+     // rotacija figure
      glRotatef(-360 * time / (1.2*12*30 * 24), 0, 0, 1);
-     glutSolidSphere(1, 16, 16);
+     switch(id){
+      case 0: glutSolidSphere(1, 16, 16); break;
+      case 1:  glutSolidCube(1.6); break;
+      case 2: {
+               glScalef(0.65,0.65,0.65);
+               glutSolidDodecahedron();
+               break;}
+     }
+     
     glPopMatrix();
-   // glBindTexture(GL_TEXTURE_2D, 0);  
 
+  /*Kapica*/
+  /*
+    GLfloat ambient_coeffs3[] = { 0.8, 1, 0.2, 1 };
+    GLfloat diffuse_coeffs3[] = { 0.247059 , 1,0.564706,1};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs3);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs3);
+    glPushMatrix();
+     glColor3f(1, 0, 0);
+     glTranslatef(x_curr,1.2,z_curr);
+     glRotatef(-90,1,0,0);
+     glutSolidCone(0.5,0.8,16,16);
+    glPopMatrix();
+
+    */
+ 
     /* Pravljenje putanje*/
     //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
@@ -443,7 +472,7 @@ static void on_display(void)
     
     /*Kao putanju loptice koristicemo skaliranu kocku*/
     //1
-    /*Postavljamo strukturu na putanju (stenu)*/
+    /*Postavljamo teksturu na putanju (stenu)*/
     glBindTexture(GL_TEXTURE_2D, names[0]);     
       glBegin(GL_POLYGON);
         glNormal3f(0,1,0); 
@@ -468,11 +497,8 @@ static void on_display(void)
       glScalef(100,thickness,15);
       glutSolidCube(1);
     glPopMatrix();
-
-   
-    
+ 
     //2
-
     glBindTexture(GL_TEXTURE_2D, names[0]);     
       glBegin(GL_POLYGON);
         glNormal3f(0,1,0); 
@@ -714,464 +740,12 @@ static void on_display(void)
       glutSolidCone(15,100,16,16);
     glPopMatrix();
 
-    /*Prepreke na putu*/
-
-    /*Osvetljenje i materijali prepreka*/
+    /*Iscrtavanje prepreka*/
+     Draw();
     
-    glShadeModel(GL_SMOOTH);    
-    GLfloat light_p1[] = { -10, 100, 1000, 0 };
-    GLfloat light_a1[] = { 0.7, 0.2, 0.2, 1 };    
-    GLfloat light_d1[] = { 0.3, 0.4, 0.9, 1 };    
-    GLfloat light_s1[] = { 0.9, 0.9, 0.9, 1 };    
-    GLfloat a_coeffs1[] = { 0.7, 0.5, 0.1, 1 };    
-    GLfloat d_coeffs1[] = { 0.3, 0.3, 0.8, 1 };   
-                            //0.4,1,1,1
-    GLfloat s_coeffs1[] = { 0.447059 , 0.264706,0.284706, 1}; 
-    GLfloat sh1 = 1;
-
-    
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_p1);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_a1);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_d1);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_s1);
-
-   
-    glMaterialfv(GL_FRONT, GL_AMBIENT, a_coeffs1);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, d_coeffs1);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, s_coeffs1);
-    glMaterialf(GL_FRONT, GL_SHININESS, sh1);  
-    
-    //01
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(-10,1.5,-4.5);
-      glScalef(5,3,3);
-      glutSolidCube(1);
-    glPopMatrix();
-    //02
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(10,2.15,-1.6);
-      glScalef(4.3,4.3,4.3);
-      glutSolidCube(1);
-    glPopMatrix();   
-    //03
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(41,0.9,-3.2);
-      glScalef(3,1.8,2.6);
-      glutSolidCube(1);
-    glPopMatrix();
-    //04
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(78,1.5,3);
-      glScalef(5,3,3);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //31
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(140,2,3.5);
-      glScalef(1.4,1,2);
-      glutSolidCube(1);
-    glPopMatrix();
-    //32
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(161,1,-3);
-      glScalef(7,2,3);
-      glutSolidCube(1);
-    glPopMatrix();   
-    //33
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(191,-0.5,2.5);
-      glScalef(10,3,5);
-      glutSolidCube(1);
-    glPopMatrix();  
-
-     //34
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(210,1,0);
-      glScalef(2,2,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //41
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(250,1,-3);
-      glScalef(6,8,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //42
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(300,1,4);
-      glScalef(12,17,3.4);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //43
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(370,1,-5);
-      glScalef(8,4,1);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //51
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(418,1,-4);
-      glScalef(8,8,8);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //52
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(440,1,8);
-      glScalef(7,2,3);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //53
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(495,1,5);
-      glScalef(13,4,4);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //54
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(536,1,-2);
-      glScalef(7,7,7);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //55
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(570,1,-2);
-      glScalef(8,4,1);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //56
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(515,1,6);
-      glScalef(8,8,3);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //71
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(670,1,-5.5);
-      glScalef(10,2,4);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //72
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(700,1,-3.7);
-      glScalef(15,15,4);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //73
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(742,1,3.7);
-      glScalef(15,15,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //74
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(780,1,-4);
-      glScalef(5,5,5);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //75
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(808,1,7);
-      glScalef(5,4,1);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //76
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(833,1,-2);
-      glScalef(2,2,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //81
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(866,1,-4);
-      glScalef(20,20,10);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //82
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(920,1,3.7);
-      glScalef(15,3,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //83
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(935,1,-3.7);
-      glScalef(15,3,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //84
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(950,1,-7);
-      glScalef(10,7,7);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //85
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(999,1,7);
-      glScalef(18,6,5);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //86
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1060,1,-2);
-      glScalef(2,2,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //87
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1080,1,-5);
-      glScalef(5,8,3);
-      glutSolidCube(1);
-    glPopMatrix();
-  //88
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1100,1,-5);
-      glScalef(5,13,5);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //89
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1148,1,3);
-      glScalef(20,7,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //810
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1186,1,2);
-      glScalef(6,2,6);
-      glutSolidCube(1);
-    glPopMatrix();
-    //91
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1213,1,2);
-      glScalef(7,20,7);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //92
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1229,1,3.7);
-      glScalef(15,3,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //93
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1270,1,-3.7);
-      glScalef(15,3,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //94
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1342,1,-7);
-      glScalef(10,7,7);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //95
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1371,1,7);
-      glScalef(18,6,5);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //96
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1400,1,-2);
-      glScalef(2,2,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //97
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1433,1,-5);
-      glScalef(5,8,3);
-      glutSolidCube(1);
-    glPopMatrix();
-    //98
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1464,1,-5);
-      glScalef(5,13,5);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //99
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1497,1,3);
-      glScalef(20,7,1);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //910
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1515,1,3);
-      glScalef(20,7,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //911
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1547,1,3);
-      glScalef(20,7,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //912
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1582,1,-3);
-      glScalef(20,7,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-     //913
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1383,1,-3);
-      glScalef(6,6,6);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //10
-  
-    //2
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1617,1,-1.6);
-      glScalef(4.3,4.3,4.3);
-      glutSolidCube(1);
-    glPopMatrix();   
-    //3
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1635,1,-3.2);
-      glScalef(3,1.8,2.6);
-      glutSolidCube(1);
-    glPopMatrix();
-    //4
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1670,1,3);
-      glScalef(5,3,3);
-      glutSolidCube(1);
-    glPopMatrix();
-    //5
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1698,1,3.5);
-      glScalef(1.4,1,2);
-      glutSolidCube(1);
-    glPopMatrix();
-    //6
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1703,1,-3);
-      glScalef(7,2,3);
-      glutSolidCube(1);
-    glPopMatrix();   
-    //7
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1730,1,2.5);
-      glScalef(10,3,5);
-      glutSolidCube(1);
-    glPopMatrix();  
-     //8
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1760,1,0);
-      glScalef(2,2,2);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //9
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1793,1,-3);
-      glScalef(6,8,3);
-      glutSolidCube(1);
-    glPopMatrix(); 
-    //10
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1812,1,4);
-      glScalef(12,17,3.4);
-      glutSolidCube(1);
-    glPopMatrix();
-    //11
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1831,1,-5);
-      glScalef(8,4,1);
-      glutSolidCube(1);
-    glPopMatrix();
-
-    //12
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1862,1,-4);
-      glScalef(8,8,8);
-      glutSolidCube(1);
-    glPopMatrix(); 
-
-    //13
-    glColor3f(0,1,0);
-    glPushMatrix();
-      glTranslatef(1880,1,8);
-      glScalef(7,2,3);
-      glutSolidCube(1);
-    glPopMatrix();
-
     //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
-    /*DIJAMANTI*/
+    /*Dijamanti*/
 
     glShadeModel(GL_SMOOTH);       
     GLfloat a_coeffs2[] = {  0.196078 , 0.196078 , 0.8, 1 };    
@@ -1187,7 +761,7 @@ static void on_display(void)
     //1
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(6,1,3);
+      glTranslatef(6,0.5,3);
       glScalef(0.6,0.6,0.6);
       // Dijamanti se rotiraju 
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
@@ -1196,7 +770,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(10,1,3);
+      glTranslatef(10,0.5,3);
       glScalef(0.6,0.6,0.6); 
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1204,7 +778,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(14,1,3);
+      glTranslatef(14,0.5,3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1214,7 +788,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(95,1,2.5);
+      glTranslatef(95,0.5,2.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1222,7 +796,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(100,1,2.5);
+      glTranslatef(100,0.5,2.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1230,7 +804,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(120,1,-2.5);
+      glTranslatef(120,0.5,-2.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1238,7 +812,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(125,1,-2.5);
+      glTranslatef(125,0.5,-2.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1248,7 +822,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(150,1,0);
+      glTranslatef(150,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1256,7 +830,7 @@ static void on_display(void)
 
         glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(155,1,0);
+      glTranslatef(155,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1264,7 +838,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(198,1,-4);
+      glTranslatef(198,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1274,7 +848,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(253,1,-5.6);
+      glTranslatef(253,0.5,-5.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1282,7 +856,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(258,1,-5.6);
+      glTranslatef(258,0.5,-5.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1290,7 +864,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(261,1,-5.6);
+      glTranslatef(261,0.5,-5.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1299,7 +873,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(350,1,2);
+      glTranslatef(350,0.5,2);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1307,7 +881,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(360,1,2);
+      glTranslatef(360,0.5,2);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1316,7 +890,7 @@ static void on_display(void)
     //5
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(415,1,-10);
+      glTranslatef(415,0.5,-10);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1324,7 +898,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(420,1,-10);
+      glTranslatef(420,0.5,-10);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1332,7 +906,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(470,1,5.6);
+      glTranslatef(470,0.5,5.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1340,7 +914,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(477,1,5.6);
+      glTranslatef(477,0.5,5.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1348,7 +922,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(560,1,0);
+      glTranslatef(560,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1356,7 +930,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(570,1,0);
+      glTranslatef(570,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1365,7 +939,7 @@ static void on_display(void)
     //6
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(630,1,0);
+      glTranslatef(630,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1373,7 +947,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(634,1,0);
+      glTranslatef(634,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1382,7 +956,7 @@ static void on_display(void)
     //7
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(678,1,-6);
+      glTranslatef(678,0.5,-6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1390,7 +964,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(683,1,-6);
+      glTranslatef(683,0.5,-6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1398,7 +972,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(688,1,6);
+      glTranslatef(688,0.5,6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1406,7 +980,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(725,1,0);
+      glTranslatef(725,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1414,7 +988,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(740,1,-2.3);
+      glTranslatef(740,0.5,-2.3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1422,7 +996,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(800,1,6.8);
+      glTranslatef(800,0.5,6.8);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1430,7 +1004,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(805,1,6.8);
+      glTranslatef(805,0.5,6.8);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1439,7 +1013,7 @@ static void on_display(void)
     //8
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(869,1,-4);
+      glTranslatef(869,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1447,7 +1021,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(874,1,-4);
+      glTranslatef(874,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1455,7 +1029,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(900,1,5);
+      glTranslatef(900,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1463,7 +1037,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(900,1,0);
+      glTranslatef(900,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1471,7 +1045,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(950,1,0);
+      glTranslatef(950,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1479,7 +1053,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(955,1,0);
+      glTranslatef(955,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1487,7 +1061,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(960,1,0);
+      glTranslatef(960,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1495,7 +1069,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(980,1,5.4);
+      glTranslatef(980,0.5,5.4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1503,7 +1077,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(990,1,5.4);
+      glTranslatef(990,0.5,5.4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1512,7 +1086,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1130,1,-3);
+      glTranslatef(1130,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1520,7 +1094,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1134,1,-3);
+      glTranslatef(1134,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1529,7 +1103,7 @@ static void on_display(void)
     //9
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1200,1,-4);
+      glTranslatef(1200,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1537,7 +1111,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1205,1,-4);
+      glTranslatef(1205,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1545,7 +1119,7 @@ static void on_display(void)
 
         glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1250,1,0);
+      glTranslatef(1250,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1553,7 +1127,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1255,1,0);
+      glTranslatef(1255,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1561,7 +1135,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1260,1,0);
+      glTranslatef(1260,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1569,7 +1143,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1330,1,-7.5);
+      glTranslatef(1330,0.5,-7.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1577,7 +1151,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1335,1,-7.5);
+      glTranslatef(1335,0.5,-7.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1585,7 +1159,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1390,1,4.3);
+      glTranslatef(1390,0.5,4.3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1593,7 +1167,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1428,1,4.6);
+      glTranslatef(1428,0.5,4.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1601,7 +1175,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1433,1,4.6);
+      glTranslatef(1433,0.5,4.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1609,7 +1183,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1480,1,-3);
+      glTranslatef(1480,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1618,7 +1192,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1485,1,-3);
+      glTranslatef(1485,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1626,7 +1200,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1490,1,-3);
+      glTranslatef(1490,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1634,7 +1208,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1520,1,-3);
+      glTranslatef(1520,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1642,7 +1216,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1525,1,-3);
+      glTranslatef(1525,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1650,7 +1224,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1530,1,-3);
+      glTranslatef(1530,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1658,7 +1232,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1570,1,4);
+      glTranslatef(1570,0.5,4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1666,7 +1240,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1575,1,5);
+      glTranslatef(1575,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1674,7 +1248,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1580,1,5);
+      glTranslatef(1580,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1682,7 +1256,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1585,1,5);
+      glTranslatef(1585,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1691,7 +1265,7 @@ static void on_display(void)
     //10
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1600,1,-4);
+      glTranslatef(1600,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1699,7 +1273,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1605,1,-4);
+      glTranslatef(1605,0.5,-4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1707,7 +1281,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1650,1,0);
+      glTranslatef(1650,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1715,7 +1289,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1655,1,0);
+      glTranslatef(1655,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1723,7 +1297,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1660,1,0);
+      glTranslatef(1660,0.5,0);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1731,7 +1305,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1730,1,-7.5);
+      glTranslatef(1730,0.5,-7.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1739,7 +1313,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1735,1,-7.5);
+      glTranslatef(1735,0.5,-7.5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1747,7 +1321,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1790,1,4.3);
+      glTranslatef(1790,0.5,4.3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1755,7 +1329,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1828,1,4.6);
+      glTranslatef(1828,0.5,4.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1763,7 +1337,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1433,1,4.6);
+      glTranslatef(1433,0.5,4.6);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1771,7 +1345,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1880,1,5.-3);
+      glTranslatef(1880,0.5,5.-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1780,7 +1354,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1885,1,-3);
+      glTranslatef(1885,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1788,7 +1362,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1890,1,-3);
+      glTranslatef(1890,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1796,7 +1370,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1920,1,-3);
+      glTranslatef(1920,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1804,7 +1378,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1925,1,-3);
+      glTranslatef(1925,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1812,7 +1386,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1930,1,-3);
+      glTranslatef(1930,0.5,-3);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1820,7 +1394,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1970,1,4);
+      glTranslatef(1970,0.5,4);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1828,7 +1402,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1975,1,5);
+      glTranslatef(1975,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1836,7 +1410,7 @@ static void on_display(void)
 
     glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1980,1,5);
+      glTranslatef(1980,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
@@ -1844,13 +1418,13 @@ static void on_display(void)
 
      glColor3f(0,1,0);
     glPushMatrix();
-      glTranslatef(1985,1,5);
+      glTranslatef(1985,0.5,5);
       glScalef(0.6,0.6,0.6);
       glRotatef(360 * time / (1.2*12*30 * 24), 0, 1, 0);
       glutSolidOctahedron();
     glPopMatrix();
 
-    //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
+//+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
     /*Okolina*/
 
