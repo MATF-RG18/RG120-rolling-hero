@@ -8,7 +8,7 @@
 #include<stdbool.h>
 #include "sumpoints.h"
 
-/*Program sabira sakupljene dijamante*/
+/*Program sabira broj sakupljenih dijamanta*/
 
 int SumPoints(float x_curr,float z_curr){
 	//1

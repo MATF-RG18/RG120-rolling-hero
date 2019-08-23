@@ -53,7 +53,7 @@ Id figure
 Pocetna figura je loptica
 */
 static int id =0;
-//--------------------------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
     /* Inicijalizuje se GLUT. */
@@ -194,7 +194,6 @@ static void initialize(void)
 
 }
 
-//----------------------------------------------------------------------------------------------
 static void on_keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
@@ -257,7 +256,6 @@ static void on_keyboard(unsigned char key, int x, int y)
     }
 }
 
-//------------------------------------------------------------------------------------------
 
 static void on_timer(int value)
 {
@@ -267,7 +265,7 @@ static void on_timer(int value)
    if(value == TID_1 && animation_ongoing_W == 1){
         xPlus += 1;
         glutPostRedisplay();
-        glutTimerFunc(100,on_timer,1);
+        glutTimerFunc(120,on_timer,1);
    }
    else if(value == TID_2 && animation_ongoing_D == 1 && animation_ongoing_W == 1){
         xPlus += 1;
@@ -324,7 +322,7 @@ static void on_timer(int value)
     
   
 }
-//--------------------------------------------------------------------------------
+
 static void on_reshape(int width, int height)
 {
     /* Podesava se viewport. */
@@ -334,7 +332,7 @@ static void on_reshape(int width, int height)
     glLoadIdentity();
     gluPerspective(60, (float) width / height, 1, 1500);
 }
-//---------------------------------------------------------------------------------
+
 static void on_display(void)
 {
 
@@ -352,7 +350,7 @@ static void on_display(void)
               1, 0.5, 0);
 
     /*Osvetljenje i materijali lopte*/
-    //+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   
     glShadeModel(GL_SMOOTH);
     /* Pozicija svetla (u pitanju je direkcionalno svetlo). */
     GLfloat light_position[] = { -0.3, 2, 1, 0 };
@@ -386,7 +384,7 @@ static void on_display(void)
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);  
-    //+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    
     
 
     /* iscrtavanje koordinatnog sistema */
@@ -440,7 +438,6 @@ static void on_display(void)
     */
  
     /* Pravljenje putanje*/
-    //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
     /*Osvetljenje i materijali putanje*/
     
@@ -449,8 +446,6 @@ static void on_display(void)
     GLfloat light_a[] = { 0.2, 0.2, 0.2, 1 };    
     GLfloat light_d[] = { 0.7, 0.9, 0.9, 1 };    
     GLfloat light_s[] = { 0.9, 0.9, 0.9, 1 };    
-    //GLfloat a_coeffs[] = { 0.858824,  0.439216 , 0.576471, 1 };    
-    //GLfloat d_coeffs[] = { 0.858824 , 0.439216 , 0.576471, 1 }; 
     GLfloat a_coeffs[] = { 0.647059 , 0.164706,0.164706,1 };    
     GLfloat d_coeffs[] = { 0.647059 , 0.164706,0.164706,1 };   
     GLfloat s_coeffs[] = { 0.4, 1, 1, 1 }; 
@@ -743,7 +738,6 @@ static void on_display(void)
     /*Iscrtavanje prepreka*/
      Draw();
     
-    //+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
 
     /*Dijamanti*/
 
@@ -1424,9 +1418,6 @@ static void on_display(void)
       glutSolidOctahedron();
     glPopMatrix();
 
-//+-+-+-+-+-+-+-+--+-++-+-+-+-+-+-+-+-+--++-+-+-+-+-+-+-+-
-
-    /*Okolina*/
 
     /*Zgradice*/
 
