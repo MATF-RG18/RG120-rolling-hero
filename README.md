@@ -3,7 +3,7 @@
 
 ### :memo: Opis igre:
 Cilj igre je izbeci sve prepreke i stici do cilja sakupljajuci dijamanate na putu.
-Svaki dijamant donosi 1 poen.
+Svaki sakupljeni dijamant donosi 1 poen.
 Loptica vremenom ubrzava, a prepreke je sve teze izbeci.
 
 ### :video_game: Kontrole:
