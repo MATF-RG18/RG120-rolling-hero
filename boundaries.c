@@ -8,7 +8,7 @@
 #include<stdbool.h>
 #include "boundaries.h"
 
-/*Program proverava pozicije loptice u toku igre*/
+/*Kolizije*/
 
 bool CheckBoundries(float x_curr,float z_curr){
 

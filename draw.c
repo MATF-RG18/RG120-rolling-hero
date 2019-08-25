@@ -13,7 +13,7 @@
 
 void Draw(void){
 
-	/*Prepreke na putu*/
+	/*Program iscrtava prepreke na putu*/
 
     /*Osvetljenje i materijali prepreka*/
     

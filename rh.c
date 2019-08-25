@@ -10,7 +10,6 @@
 #include "draw.h"
 #include<stdbool.h>
 
-
 #define TIMER_INTERVAL 300
 #define TID_1 1
 #define TID_2 2
@@ -301,6 +300,7 @@ static void on_timer(int value)
     animation_ongoing_W=0;
     animation_ongoing_D=0;
     animation_ongoing_A=0;
+    printf("Broj osvojenih poena: %d\n", points);
     glutInitWindowSize(250, 20);
     glutInitWindowPosition(560, 560);
     glutCreateWindow("Game over! :(");
