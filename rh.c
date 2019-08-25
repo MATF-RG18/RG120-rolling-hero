@@ -294,7 +294,7 @@ static void on_timer(int value)
   /*Trenutne koordinate loptice*/
    x_curr = xPlus - 10;
    z_curr = zPlus-zMinus;
-
+   
    if(CheckBoundries(x_curr,z_curr) == true){
     /* Kreira se novi prozor u slucaju izgubljene igre */
     animation_ongoing_W=0;
